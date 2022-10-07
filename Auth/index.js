@@ -1,10 +1,12 @@
 const express = require('express')
 
 const app = express();
-
+const cookie = require('cookie-parser')
 const userRoute = require('./src/routes/userRoutes');
+
 require('./src/db/connectDB');
 // app.use(express.json());
+app.use(cookie());
 app.use(express.urlencoded({extended:false})); // for reading form body we have to use this
 app.use('/user', userRoute);
 

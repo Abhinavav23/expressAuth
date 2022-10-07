@@ -1,5 +1,6 @@
 const User = require('../db/models/userModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const getSignUpPage = (req, res) => {
     // let info = {
@@ -19,20 +20,40 @@ const getLoginPage = (req, res) => {
     res.render('login/login')
 }
 
+const createToken = () => {
+    
+}
+const secretKey = 'NewtonSchoolNodeBatch2022'
+
+
 const logIn = async (req, res) => {
-    console.log(req.body);
     const {email, password} = req.body
     try{
         const user = await User.findOne({email})
-        const comparePassword = bcrypt.compare(password, user.password);
+        const comparePassword = await bcrypt.compare(password, user.password);
 
-        if(user.password === password){
+        const userData = {
+            id: user._id,
+            // email: user.email,
+            // age: user.age,
+            // username: user.username
+        }
+
+        const options = {
+            expiresIn: '600s'
+        }
+        
+        const token = jwt.sign(userData,secretKey, options);
+        console.log(token);
+
+        if(comparePassword){
+            res.cookie('AuthToken', token)
             res.send(`<h3>Logged in successfully</h3>`)
         } else{
             res.send(`<h3>Password not correct</h3>`)
         }
     } catch(e){
-        res.json({error: e})
+        res.json({error: e.message})
     }
 }
 
@@ -41,10 +62,10 @@ const signUp = (req, res) => {
     const {username, email, password, age} = req.body
 
     const salt = bcrypt.genSaltSync(10);
-    console.log(salt);
+    // console.log(salt);
 
     const securedPwd = bcrypt.hashSync(password, 10);
-    console.log(securedPwd);
+    // console.log(securedPwd);
 
     const newUser  = new User({
         username,
@@ -64,9 +85,32 @@ const signUp = (req, res) => {
     // User.find()
 }
 
+const getProfile = async (req, res) => {
+    const {AuthToken} = req.cookies;
+        jwt.verify(AuthToken, secretKey, async (err, decodedToken) => {
+            try{
+                if(err){
+                    res.json({error: err});
+                } else{
+                    const user = await User.findById(decodedToken.id);
+                    res.send(`<h3>Profile page --- UserName: ${user.username} --- Email: ${user.email} Age: ${user.age}</h3>`)
+                }
+            } catch(e){
+                res.json({error: e})
+            }
+        })
+}
+
+const validateUser = (req, res, next) => {
+    console.log('userMiddleware');
+    next();
+}
+
 module.exports = {
     getSignUpPage,
     getLoginPage,
     signUp,
-    logIn
+    logIn,
+    getProfile,
+    validateUser
 }
