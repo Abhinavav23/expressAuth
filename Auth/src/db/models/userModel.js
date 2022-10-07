@@ -6,8 +6,10 @@ const Schema =  mongoose.Schema
 const userSchema = new Schema({
     username: {
         type: String,
-        required: true,
+        // required: true,
+        required: [true, 'You must enter the userName'], //custom error message
         minlength: 7
+        // minlength: [7, 'min user name length is seven']
     },
     email: {
         type: String,
