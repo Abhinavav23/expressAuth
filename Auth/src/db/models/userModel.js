@@ -8,18 +8,18 @@ const userSchema = new Schema({
         type: String,
         // required: true,
         required: [true, 'You must enter the userName'], //custom error message
-        minlength: 7
+        minlength: 4
         // minlength: [7, 'min user name length is seven']
     },
     email: {
         type: String,
         required: true,
-        minlength: 10
-    },
+        minlength: 4
+    },   
     password: {
         type: String,
         required: true,
-        minlength: 8
+        minlength: 4
     },
     age: {
         type: Number,

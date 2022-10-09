@@ -19,11 +19,20 @@ const getLoginPage = (req, res) => {
     // }
     res.render('login/login')
 }
+const secretKey = 'NewtonSchoolNodeBatch2022';
 
-const createToken = () => {
-    
+// takes a user for which we are creating the token
+const createToken = (user) => {
+    const userData = {
+        id: user._id
+    }
+    const options = {
+        expiresIn: '600s'
+    }
+
+    const token = jwt.sign(userData,secretKey, options);
+    return token
 }
-const secretKey = 'NewtonSchoolNodeBatch2022'
 
 
 const logIn = async (req, res) => {
@@ -32,19 +41,7 @@ const logIn = async (req, res) => {
         const user = await User.findOne({email})
         const comparePassword = await bcrypt.compare(password, user.password);
 
-        const userData = {
-            id: user._id,
-            // email: user.email,
-            // age: user.age,
-            // username: user.username
-        }
-
-        const options = {
-            expiresIn: '600s'
-        }
-        
-        const token = jwt.sign(userData,secretKey, options);
-        console.log(token);
+        const token = createToken(user);
 
         if(comparePassword){
             res.cookie('AuthToken', token)
@@ -74,7 +71,11 @@ const signUp = (req, res) => {
         age
     })
     newUser.save()
-    .then((data) => {
+    .then((newUser) => {
+        console.log('new user');
+        console.log(newUser);
+        const token = createToken(newUser);
+        res.cookie('AuthToken', token)
         res.send('<h3>SignUp successful</h3>')
     })
     .catch((e) => {
@@ -101,6 +102,10 @@ const getProfile = async (req, res) => {
         })
 }
 
+const getOrders = (req, res) => {
+    res.send('orders page');
+}
+
 const validateUser = (req, res, next) => {
     console.log('userMiddleware');
     next();
@@ -112,5 +117,6 @@ module.exports = {
     signUp,
     logIn,
     getProfile,
-    validateUser
+    validateUser,
+    getOrders
 }
