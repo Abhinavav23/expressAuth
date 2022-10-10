@@ -103,7 +103,8 @@ const getProfile = async (req, res) => {
 }
 
 const getOrders = (req, res) => {
-    res.send('orders page');
+    console.log(req.user.age);
+    res.send(`<h3>this is orders page for ${req.user.username}</h3>`);
 }
 
 const validateUser = (req, res, next) => {
@@ -120,3 +121,13 @@ module.exports = {
     validateUser,
     getOrders
 }
+
+const arr = [1,2,3,45]; //--> 5
+
+const arr1 = [1,3,4]; // ---> 3
+
+arr1.push(34);
+
+// arr should have 4 elements. --> true ---> fail
+// arr1 should have 4 elements. --> true --> fail
+

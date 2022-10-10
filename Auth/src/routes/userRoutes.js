@@ -15,7 +15,6 @@ router.post('/signup', signUp);
 router.get('/profile', validateUser, getProfile);
 router.get('/orders', passport.authenticate('jwt', {session: false}), getOrders);
 
-
 router.all('*', (req, res) => {
     res.send('User page not found')
 })
